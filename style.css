@@ -1,24 +1,77 @@
 body,
 pre {
-	background-color: #333;
-	color: #fff;
+  background-color: #333;
+  color: #fff;
 }
 
-hr {
-	border-color: #fff;
+body:after {
+  content: '';
+  background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Etihad_Stadium.jpg/1200px-Etihad_Stadium.jpg');
+  background-size: cover;
+  opacity: 0.8;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
 }
 
-.gsap-btn {
-	background-color: #73b102;
-	color: #fff;
+.app {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
 }
 
-.gsap-btn:hover,
-.gsap-btn:active,
-.gsap-btn:focus {
-	background-color: #88ce02;
+.toggle-buttons {
+  width: 100vw;
+  background-color: black;
+  display: flex;
+  justify-content: center;
 }
 
-.logo {
-	width: 150px;
+.overlay-bg {
+  width: 100%;
+  background: rgb(3, 3, 3);
+  background: -moz-linear-gradient(180deg, rgba(3, 3, 3, 1) 19%, rgba(255, 255, 255, 0) 84%);
+  background: -webkit-linear-gradient(180deg, rgba(3, 3, 3, 1) 19%, rgba(255, 255, 255, 0) 84%);
+  background: linear-gradient(180deg, rgba(3, 3, 3, 1) 19%, rgba(255, 255, 255, 0) 84%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#030303",endColorstr="#ffffff",GradientType=1);
+  z-index: 0;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.hometeam,
+.awayteam {
+  position: absolute;
+  z-index: 4;
+}
+
+.hometeam { 
+  left: 50px;
+}
+
+.awayteam {
+  left: 50px;
+}
+
+
+.scores {
+  position: absolute;
+  left: 50px;
+  z-index: 5;
+}
+
+.clock {
+  position: absolute;
+  left: 50px;
+  z-index: 4;
+  
 }
