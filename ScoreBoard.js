@@ -107,7 +107,7 @@ class ScoreBoard extends PureComponent {
           this.setState({ isAnimating: true });
         }
       })
-      .to(this.teamStatRef, 1, { x: cardWidth * 3.1 }, '-=0.5')
+      .to(this.teamStatRef, 1, { x: cardWidth * 3.2 }, '-=0.5')
       .to(this.teamStatRightColRef, 1, {
         x: cardWidth * 3 - 15,
         onComplete: () => {
