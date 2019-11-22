@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { TimelineLite } from 'gsap/all';
-
+import Timer from './components/Timer';
 class ScoreBoard extends PureComponent {
   constructor(props) {
     super(props);
@@ -26,26 +26,7 @@ class ScoreBoard extends PureComponent {
   }
 
   componentDidMount() {
-    // countdown timer
-
-    this.myInterval = setInterval(() => {
-      const { seconds, minutes } = this.state;
-      if (seconds > 0) {
-        this.setState(({ seconds }) => ({
-          seconds: seconds - 1
-        }));
-      }
-      if (seconds === 0) {
-        if (minutes === 0) {
-          clearInterval(this.myInterval);
-        } else {
-          this.setState(({ minutes }) => ({
-            minutes: minutes - 1,
-            seconds: 59
-          }));
-        }
-      }
-    }, 1000);
+   
 
     console.log('default animation', this.props.animation);
     // card width 80px relates directly to a css variable --card-width style.css
@@ -53,7 +34,6 @@ class ScoreBoard extends PureComponent {
 
     // score board timeline
     this.scoreboardTimeline
-
       .from(this.scoreboardRef_scores, 0.5, {
         scaleX: 0,
         autoAlpha: 0,
@@ -118,8 +98,8 @@ class ScoreBoard extends PureComponent {
 
   // compare props
   componentDidUpdate(prevProps, prevState) {
-    console.log(prevState.isAnimating);
-    console.log(this.state.isAnimating);
+   
+    
 
     // we attempt to pause if we are animating
     if (this.state.isAnimating) {
@@ -129,7 +109,7 @@ class ScoreBoard extends PureComponent {
       }, 1500);
     }
 
-    //   prev and current Props
+    
 
     // play the scoreboard animation 0 : 1
     if (!this.state.isAnimating) {
@@ -175,7 +155,7 @@ class ScoreBoard extends PureComponent {
   }
 
   render() {
-    const { minutes, seconds } = this.state;
+ 
     return (
       <div className="overlay-bg">
         <div>
@@ -213,7 +193,7 @@ class ScoreBoard extends PureComponent {
                 <span ref={e => (this.awayTeamTextRef = e)}>MU</span>
               </div>
               <div ref={div => (this.clockRef = div)} className="clock custom-card">
-                {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                 <Timer />
               </div>
               <div className="teamstat" ref={div => (this.teamStatRef = div)}>
                 <div
