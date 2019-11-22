@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { render } from "react-dom";
-import ScoreBoard from "./ScoreBoard";
-import "./style.css";
+import React, { useState } from 'react';
+import { render } from 'react-dom';
+import ScoreBoard from './ScoreBoard';
+import './style.css';
 
 const App = () => {
   const [animation, setAnimation] = useState([]);
@@ -12,7 +12,7 @@ const App = () => {
       setAnimation([]);
     }
     if (animation.length === 0) {
-      let tmpObj = [{ animation: "main", delay: 0 }];
+      let tmpObj = [{ animation: 'main', delay: 0 }];
       setAnimation(tmpObj);
     }
   };
@@ -22,10 +22,8 @@ const App = () => {
     if (animation.length === 0) {
       return;
     }
-    if (
-      animation.find(({ animation }) => animation === "teamStat") === undefined
-    ) {
-      setAnimation([...animation, { animation: "teamStat", delay: 0.6 }]);
+    if (animation.find(({ animation }) => animation === 'teamStat') === undefined) {
+      setAnimation([...animation, { animation: 'teamStat', delay: 0.6 }]);
     } else {
       let tmpArr = animation[0];
       setAnimation([tmpArr]);
@@ -34,22 +32,18 @@ const App = () => {
 
   return (
     <div className="app">
-      <ScoreBoard
-     
-        animation={animation}
-        awayTeamColor="red"
-        homeTeamColor="green"
-      />
+      <ScoreBoard animation={animation} awayTeamColor="white" homeTeamColor="#db251e" />
       <div className="toggle-buttons">
         <button className="mr-2 btn" onClick={toggleMainBoard}>
           toggle scoreboard component
         </button>
-
-        <button className="btn mr-2" onClick={toggleTeamStat}>toggle teamStat component</button>
+        <button className="btn mr-2" onClick={toggleTeamStat}>
+          toggle teamStat component
+        </button>
         Photo by Serkan Turk on Unsplash
       </div>
     </div>
   );
 };
 
-render(<App />, document.getElementById("root"));
+render(<App />, document.getElementById('root'));

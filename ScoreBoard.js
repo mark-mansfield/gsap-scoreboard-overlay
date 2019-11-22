@@ -1,125 +1,181 @@
-import React, { PureComponent } from "react";
-import { TimelineLite, CSSPlugin } from "gsap/all";
-
-
-
-  const scoreBoardTimeLineComplete = () => {
-    console.log("scoreboard  timeline complete");
-    if (this.props.animation.length !== 2) {
-      this.clockTimeLine.play();
-    }
-  };
-
-  const clockTimeLineComplete = () => {
-    console.log("clock timeline complete");
-  };
+import React, { PureComponent } from 'react';
+import { TimelineLite } from 'gsap/all';
 
 class ScoreBoard extends PureComponent {
   constructor(props) {
     super(props);
-
+    this.state = {
+      isAnimating: false,
+      minutes: 90,
+      seconds: 0
+    };
     this.scoreboardRef = null;
     this.scoreboardRef_homeTeam = null;
+    this.homeTeamTextRef = null;
+    this.awayTeamTextRef = null;
     this.scoreboardRef_scores = null;
     this.scoreboardRef_awayTeam = null;
+    this.scoreTextRef = null;
     this.clockRef = null;
     this.teamStatRef = null;
-
-    this.scorboardTimeline = new TimelineLite({ paused: true });
+    this.teamStatLeftColRef = null;
+    this.teamStatRightColRef = null;
+    this.scoreboardTimeline = new TimelineLite({ paused: true });
     this.clockTimeLine = new TimelineLite({ paused: true });
     this.teamStatTimeline = new TimelineLite({ paused: true });
   }
 
-
-  
-
   componentDidMount() {
-    console.log("default animation", this.props.animation);
+    // countdown timer
+
+    this.myInterval = setInterval(() => {
+      const { seconds, minutes } = this.state;
+      if (seconds > 0) {
+        this.setState(({ seconds }) => ({
+          seconds: seconds - 1
+        }));
+      }
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(this.myInterval);
+        } else {
+          this.setState(({ minutes }) => ({
+            minutes: minutes - 1,
+            seconds: 59
+          }));
+        }
+      }
+    }, 1000);
+
+    console.log('default animation', this.props.animation);
+    // card width 80px relates directly to a css variable --card-width style.css
+    const cardWidth = 80;
 
     // score board timeline
-    this.scorboardTimeline.from(this.scoreboardRef, null, {
-        onComplete: this.scoreBoardTimeLineComplete,
-      })
-      .from(this.scoreboardRef_scores, 1, {
+    this.scoreboardTimeline
+
+      .from(this.scoreboardRef_scores, 0.5, {
         scaleX: 0,
-        autoAlpha: 0
-      })
-      .from(this.scoreboardRef_homeTeam, 1, {
         autoAlpha: 0,
-      })
-      .to(this.scoreboardRef_homeTeam, 1, {
-        left: 0,
-      })
-      .from( this.scoreboardRef_awayTeam, 1,
-        {
-          autoAlpha: 0,
+        onStart: () => {
+          console.log('starting animation');
+          this.setState({ isAnimating: true });
         }
-      ).to(this.scoreboardRef_awayTeam, 1, {
-        left: 100,
+      })
+      .from(this.scoreTextRef, 0.3, { autoAlpha: 0, scale: 2 })
+      .from(this.scoreboardRef_homeTeam, 0.3, { autoAlpha: 0 })
+      .to(this.scoreboardRef_homeTeam, 0.3, { left: 0 })
+      .from(this.homeTeamTextRef, 0.3, { autoAlpha: 0, x: 20 })
+      .from(this.scoreboardRef_awayTeam, 0.3, { autoAlpha: 0 }, '-=0.9')
+      .to(this.scoreboardRef_awayTeam, 0.3, { left: cardWidth * 2 + 10 })
+      .from(this.awayTeamTextRef, 0.3, {
+        autoAlpha: 0,
+        x: -20,
+        onComplete: () => {
+          this.setState({ isAnimating: false });
+          if (this.props.animation.length !== 2) {
+            this.clockTimeLine.play();
+          }
+        }
       });
 
     //  clock timeline
-    this.clockTimeLine.from(this.clockRef, 2, {
-      onComplete: this.clockTimeLineComplete,
-    })
-    .from(this.clockRef, 1, {
-       autoAlpha: 0
+    this.clockTimeLine
+      .from(this.clockRef, 0.5, {
+        autoAlpha: 0,
+        onStart: () => {
+          this.setState({ isAnimating: true });
+        }
       })
-     .to(this.clockRef, 1,{
-       right: 150
-     });
+      .to(
+        this.clockRef,
+        1,
+        {
+          left: cardWidth * 3 + 9,
+          onComplete: () => {
+            this.setState({ isAnimating: false });
+          }
+        },
+        '-=0.5'
+      );
 
     // team stats time line
-    this.teamStatTimeline.from(this.teamStatRef, 0.8, { autoAlpha: 0 });
+    this.teamStatTimeline
+      .from(this.teamStatRef, 1, {
+        autoAlpha: 0,
+        onStart: () => {
+          this.setState({ isAnimating: true });
+        }
+      })
+      .to(this.teamStatRef, 1, { x: cardWidth * 3.1 }, '-=0.5')
+      .to(this.teamStatRightColRef, 1, {
+        x: cardWidth * 3 - 15,
+        onComplete: () => {
+          this.setState({ isAnimating: false });
+        }
+      });
   }
 
   // compare props
   componentDidUpdate(prevProps, prevState) {
+    console.log(prevState.isAnimating);
+    console.log(this.state.isAnimating);
+
+    // we attempt to pause if we are animating
+    if (this.state.isAnimating) {
+      console.log('PAUSING *******************');
+      setTimeout(() => {
+        console.log('PAUSING COMPLETE');
+      }, 1500);
+    }
+
     //   prev and current Props
-    console.log(prevProps.animation.length);
-    console.log(this.props.animation.length);
 
     // play the scoreboard animation 0 : 1
-    if (prevProps.animation.length === 0 && this.props.animation.length === 1) {
-      this.scorboardTimeline.delay(this.props.animation[0].delay);
-      this.scorboardTimeline.play();
-      console.log("play the scoreboard animation");
-    }
+    if (!this.state.isAnimating) {
+      if (prevProps.animation.length === 0 && this.props.animation.length === 1) {
+        this.scoreboardTimeline.delay(this.props.animation[0].delay);
+        this.scoreboardTimeline.play();
 
-    // reverse the clock animation
-    // play the team stat animation  1 : 2
-    if (this.props.animation.length === 2) {
-      this.clockTimeLine.reverse(0.3);
-      this.teamStatTimeline.delay(this.props.animation[0].delay);
-      this.teamStatTimeline.play();
-      console.log("reverse the clock animation");
-      console.log("play the team stat animation");
-    }
+        console.log('play the scoreboard animation');
+      }
 
-    // reverse the team Stat and play the clock animation
-    if (prevProps.animation.length === 2 && this.props.animation.length === 1) {
-      this.teamStatTimeline.reverse();
-      this.clockTimeLine.play();
-      console.log("reverse the team stat animation");
-      console.log("play the clock animation");
-    }
+      // reverse the clock animation
+      // play the team stat animation  1 : 2
+      if (this.props.animation.length === 2) {
+        this.clockTimeLine.reverse();
+        // this.teamStatTimeline.delay(this.props.animation[0].delay);
+        this.teamStatTimeline.play().delay(this.props.animation[0].delay);
+      }
 
-    if (prevProps.animation.length === 1 && this.props.animation.length === 0) {
-      this.clockTimeLine.reverse(0.3);
-      this.scorboardTimeline.reverse();
-      console.log("reverse the scoreboard animation");
-    }
+      // reverse the team Stat and play the clock animation
+      if (prevProps.animation.length === 2 && this.props.animation.length === 1) {
+        this.teamStatTimeline.reverse(1.5);
+        this.clockTimeLine.play().delay(1);
+      }
 
-    if (prevProps.animation.length === 2 && this.props.animation.length === 0) {
-      this.teamStatTimeline.reverse(0.3);
-      this.clockTimeLine.set(this.clockRef, { alpha: 0 });
-      this.scorboardTimeline.reverse(1);
-      console.log("reverse the scoreboard animation");
+      // reverse the scoreboard animation hide scoreboard
+      if (prevProps.animation.length === 1 && this.props.animation.length === 0) {
+        this.clockTimeLine.reverse(0.3);
+        this.scoreboardTimeline.reverse(1).delay(1);
+      }
+
+      // when the teamstat component is in full view and the scoreboard is toggled out
+      // reverse all animations
+      if (prevProps.animation.length === 2 && this.props.animation.length === 0) {
+        this.setState({ isAnimating: true });
+        this.teamStatTimeline.reverse();
+        this.clockTimeLine.reverse().delay(1);
+        this.scoreboardTimeline.reverse().delay(2.5);
+        setTimeout(() => {
+          this.setState({ isAnimating: false });
+        }, 2500);
+      }
     }
   }
 
   render() {
-    console.log("props", this.props.animation);
+    const { minutes, seconds } = this.state;
     return (
       <div className="overlay-bg">
         <div>
@@ -127,65 +183,58 @@ class ScoreBoard extends PureComponent {
             <div className="d-flex" ref={div => (this.scoreboardRef = div)}>
               <div
                 // effect slide left
-                className="hometeam"
+                className="hometeam custom-card"
                 ref={div => (this.scoreboardRef_homeTeam = div)}
                 style={{
                   backgroundColor: this.props.homeTeamColor,
-                  textAlign: "center",
-                  width: "50px"
-                }}
-              >
-                GG
+                  textAlign: 'center'
+                }}>
+                <span ref={e => (this.homeTeamTextRef = e)}>GG</span>
               </div>
 
               <div
-                className="scores"
+                className="scores custom-card"
                 // effect fade in and scaleX
                 ref={div => (this.scoreboardRef_scores = div)}
                 style={{
-                  backgroundColor: "orange",
-                  textAlign: "center",
-                  width: "50px"
-                }}
-              >
-                2:0{" "}
+                  textAlign: 'center'
+                }}>
+                <span ref={e => (this.scoreTextRef = e)}>2:0</span>
               </div>
 
               <div
-                className="awayteam"
+                className="awayteam custom-card"
                 // effect slide right
                 ref={div => (this.scoreboardRef_awayTeam = div)}
                 style={{
                   backgroundColor: this.props.awayTeamColor,
-                  textAlign: "center",
-                  width: "50px"
-                }}
-              >
-                MU
+                  textAlign: 'center'
+                }}>
+                <span ref={e => (this.awayTeamTextRef = e)}>MU</span>
               </div>
-              <div
-                ref={div => (this.clockRef = div)}
-                className="clock"
-                style={{
-                  backgroundColor: "black",
-                  textAlign: "center",
-                  width: "50px",
-                  height: "24px"
-                }}
-              >
-                90:00
+              <div ref={div => (this.clockRef = div)} className="clock custom-card">
+                {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
               </div>
-            </div>
+              <div className="teamstat" ref={div => (this.teamStatRef = div)}>
+                <div
+                  ref={div => (this.teamStatLeftColRef = div)}
+                  className="team-stat-left-col"
+                  style={{
+                    backgroundColor: this.props.homeTeamColor
+                  }}>
+                  <div className="team-logo">
+                    <i className="fa fa-shield "></i>
+                  </div>
+                  <div className="team-name">Kingston City</div>
+                </div>
 
-            <div
-              ref={div => (this.teamStatRef = div)}
-              style={{
-                backgroundColor: this.props.awayTeamColor,
-                textAlign: "center",
-                width: "200px"
-              }}
-            >
-              GG
+                <div ref={div => (this.teamStatRightColRef = div)} className="team-stat-right-col team-red-cards">
+                  <div>Red Cards</div>
+                  <div>
+                    <span className="large-text">0</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
